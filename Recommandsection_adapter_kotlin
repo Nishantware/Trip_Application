@@ -1,0 +1,40 @@
+package com.newproj.myapplication.Adapter
+
+import android.content.Context
+import android.view.LayoutInflater
+import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.newproj.myapplication.Model.Place
+import com.newproj.myapplication.databinding.ViewholderRecommandedBinding
+
+class RecommandAdapter(private val places: List<Place> ) :
+RecyclerView.Adapter<RecommandAdapter.Viewholder>(){
+    private lateinit var context:Context
+
+        class Viewholder (val binding : ViewholderRecommandedBinding):
+    RecyclerView.ViewHolder(binding.root)
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecommandAdapter.Viewholder {
+     context=parent.context
+        val binding = ViewholderRecommandedBinding.inflate(
+            LayoutInflater.from(context),
+            parent,
+            false
+
+        )
+        return Viewholder(binding)
+    }
+
+    override fun onBindViewHolder(holder: RecommandAdapter.Viewholder, position: Int) {
+        val trip = places[position]
+        Glide.with(context)
+            .load(trip.picUrl)
+            .into(holder.binding.img)
+
+        holder.binding.titletxt.text = trip.title
+    }
+
+    override fun getItemCount(): Int = places.size
+
+}
