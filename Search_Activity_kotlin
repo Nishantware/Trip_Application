@@ -1,0 +1,98 @@
+package com.newproj.myapplication.Activity
+
+import android.location.Location
+import android.os.Bundle
+import android.view.View
+import android.widget.ArrayAdapter
+import androidx.activity.enableEdgeToEdge
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.text.util.LocalePreferences.FirstDayOfWeek.Days
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
+import com.newproj.myapplication.R
+import com.newproj.myapplication.databinding.ActivityMainBinding
+import com.newproj.myapplication.databinding.ActivitySearchBinding
+import com.newproj.myapplication.databinding.ActivitySearchBinding.inflate
+import java.text.SimpleDateFormat
+import java.util.ArrayList
+import java.util.Calendar
+import java.util.Locale
+
+class search_activity : AppCompatActivity() {
+    private lateinit var binding: ActivityMainBinding
+    private var adultpassenger = 1
+    private var dateFormat = SimpleDateFormat("d MMM,YYYY", Locale.ENGLISH)
+    private var  calendar = Calendar.getInstance()
+    var database : FirebaseDatabase?= null
+    private lateinit var category: String
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
+        setContentView(binding.root)
+     binding = ActivitySearchBinding.inflate(layoutInflater)
+        database = FirebaseDatabase.getInstance()
+
+        initLocation()
+        initpassenger()
+
+    }
+
+
+
+
+    private fun initpassenger() {
+    binding.apply {
+        Plusadultbtn.setOnclicklistneer{
+            adultpassenger++
+            adulttxt.text ="$adultpassenger Adult"
+
+        }
+        minusAdultBtn.setOnclicklistner{
+            if(adultpassenger>1){
+                adultpassenger--
+                adulttext.text="$adultpassenger Adult"
+            }
+        }
+    }
+    }
+
+    private fun initLocation() {
+        binding.apply {
+            progressBarrecmmandation.visibility=View.VISIBLE
+            progressBarupcoming.visibility=View.VISIBLE
+            val myRef : DatabaseReference=database!!.getReference("Location")
+            val list = ArrayList<Location>()
+            myRef.addListenerForSingleValueEvent(object :ValueEventListener{
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    if(snapshot.exists()){
+                        for (issue in snapshot.children){
+                            issue.getValue(Location::class.java)?.let { list.add(it) }
+                        }
+                        val adapter = ArrayAdapter(this@search_activity,R.layout.sp_item,list).also {
+                            it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                        }
+                        binding.apply {
+//                            fromsp.adapter = adpater
+//                            tosp.adapter = adapter
+//                            fromsp.setselection(1)
+//                            progressBarrecmmandation.visibility=View.GONE
+                            progressBarupcoming.visibility=View.GONE
+
+                        }
+                    }
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    TODO("Not yet implemented")
+                }
+
+            })
+        }
+    }
+}
