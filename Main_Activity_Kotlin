@@ -1,0 +1,63 @@
+package com.newproj.myapplication.Activity
+
+import android.content.Intent
+import android.os.Bundle
+import android.view.View
+import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.newproj.myapplication.Adapter.RecommandAdapter
+import com.newproj.myapplication.Adapter.TripsAdapter
+import com.newproj.myapplication.Viewmodel.Mainviewmodel
+import com.newproj.myapplication.databinding.ActivityMainBinding
+
+class MainActivity : AppCompatActivity() {
+
+    private lateinit var binding: ActivityMainBinding
+    private val viewModel : Mainviewmodel by viewModels()
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
+        observeViewModel()
+        setupCategoryListner()
+
+    }
+
+    private fun setupCategoryListner() {
+        binding.cart1.setOnClickListener { startActivity(Intent(this,search_activity::class.java).putExtra("cat","1")) }
+        binding.cart2.setOnClickListener { startActivity(Intent(this,search_activity::class.java).putExtra("cat","2")) }
+        binding.cart3.setOnClickListener { startActivity(Intent(this,search_activity::class.java).putExtra("cat","3")) }
+        binding.cart4.setOnClickListener { startActivity(Intent(this,search_activity::class.java).putExtra("cat","4")) }
+    }
+
+    private fun observeViewModel() {
+        viewModel.UpcomingTrips.observe(this){
+            list->
+            binding.progressBarupcoming.visibility = View.GONE
+            binding.viewupcoming.apply {
+                layoutManager = LinearLayoutManager(
+                 this@MainActivity ,
+                 LinearLayoutManager.HORIZONTAL,false
+                )
+                adapter=TripsAdapter(list)
+            }
+        }
+        viewModel.recommededplaces.observe(this){list->
+            binding.progressBarrecmmandation.visibility = View.GONE
+
+            binding.viewupcoming.apply {   //insted view upcoming use viewrecommnded
+                layoutManager =LinearLayoutManager(
+                    this@MainActivity,
+                    LinearLayoutManager.HORIZONTAL,
+                    false
+                )
+                adapter = RecommandAdapter(list)
+            }
+        }
+    }
+}
