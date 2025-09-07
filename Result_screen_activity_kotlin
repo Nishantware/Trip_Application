@@ -1,0 +1,84 @@
+package com.newproj.myapplication.Activity
+
+import android.os.Bundle
+import android.view.View
+import android.view.View.GONE
+import androidx.activity.enableEdgeToEdge
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.Query
+import com.google.firebase.database.ValueEventListener
+import com.newproj.myapplication.Adapter.TripsAdapter
+import com.newproj.myapplication.Model.Trip
+import com.newproj.myapplication.R
+import com.newproj.myapplication.databinding.ActivityResultBinding
+import com.newproj.myapplication.databinding.ActivityResultBinding.*
+import com.newproj.myapplication.databinding.ActivitySearchBinding
+import java.util.Date
+
+class Result_Activity : AppCompatActivity() {
+    private lateinit var binding:ActivitySearchBinding
+    private lateinit var from : String
+    private lateinit var to : String
+    private lateinit var date : String
+    var database:FirebaseDatabase?=null
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
+//        binding = inflate(/* inflater = */ this.layoutInflater)
+        setContentView(binding.root)
+        database = FirebaseDatabase.getInstance()
+
+        getinstanceextra()
+        setvaraible()
+        initlist()
+    }
+
+    private fun initlist() {
+        val myref:DatabaseReference=database!!.getReference("Trips")
+        val list = ArrayList<Trip>()
+        val query:Query=myref.orderByChild("from").equalTo(from)
+        query.addListenerForSingleValueEvent(object : ValueEventListener {
+
+            override fun OnDataChange(snapshot: DataSnapshot){
+                if (snapshot.exists()){
+                    for (issue in snapshot.children){
+                    val tirp=issue.getValue(Trip::class.java)
+                        val trip = null
+                        trip?.let{
+                            if(it.to==to){
+                                list.add(it);
+                            }
+                        }
+                    }
+
+                    if(list.isNotEmpty()){
+                        LinearLayoutManager(this@Result_Activity,LinearLayoutManager.VERTICAL,false).also { binding.searchview.layoutmanager = it }
+                        TripsAdapter(list).also { it.also { it.also { binding.searchview.adapter = it } } }
+
+
+                    }
+
+                    binding.progressBarTo.visibility= GONE
+            }
+
+        }
+
+        })
+    }
+
+    private fun setvaraible() {
+        binding.backbtn.setOnClickListener{finish()}
+    }
+
+    private fun getinstanceextra() {
+        from=intent.getStringExtra("from")?:""
+        to=intent.getStringExtra("to")?:""
+        date=intent.getStringExtra("date")?:""
+    }
+}
