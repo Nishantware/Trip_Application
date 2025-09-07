@@ -1,0 +1,53 @@
+package com.newproj.myapplication.Adapter
+
+import android.content.Context
+import android.os.Parcel
+import android.os.Parcelable
+import android.view.LayoutInflater
+import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.Recycler
+import com.bumptech.glide.Glide
+import com.newproj.myapplication.Model.Trip
+import com.newproj.myapplication.databinding.ViewholderTripBinding
+
+class TripsAdapter(private val trips : List<Trip>):
+    RecyclerView.Adapter<TripsAdapter.Viewholder>()  {
+
+        private lateinit var context:Context
+
+    class Viewholder (val binding: ViewholderTripBinding):
+    RecyclerView.ViewHolder(binding.root)
+
+
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TripsAdapter.Viewholder {
+        context=parent.context;
+        val binding = ViewholderTripBinding.inflate(
+            LayoutInflater.from(context),
+            parent,
+            false
+        )
+        return Viewholder(binding)
+    }
+
+    override fun onBindViewHolder(holder: TripsAdapter.Viewholder, position: Int) {
+        val trip= trips[position]
+        Glide.with(context)
+            .load(trip.companylogo)
+            .into(holder.binding.logo)
+
+        holder.binding.companytext.text=trip.companylogo
+        holder.binding.fromtxt.text = trip.from
+        holder.binding.Afromshorttext.text = trip.fromShort
+        holder.binding.totext.text=trip.to
+        holder.binding.toshorttext.text= trip.toshort
+        holder.binding.arrivaltext.text=trip.arriveTime
+        holder.binding.scoretxt.text = trip.score.toString()
+        holder.binding.pricetxt.text="\$${trip.price}/per"
+    }
+
+    override fun getItemCount(): Int  = trips.size
+
+
+}
